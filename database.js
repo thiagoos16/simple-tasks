@@ -23,9 +23,12 @@ export class Database {
        let data = this.#database[table] ?? []
 
        if (search) {
-            data =  data.filter(row => {
+            data = data.filter(row => {
                 return Object.entries(search).some(([key, value]) => {
-                    return row[key].toLowerCase().includes(value.toLowerCase())
+                    value = decodeURIComponent(value.replace(/%20/g, ' '))
+                    
+                    if (value)
+                        return row[key].toLowerCase().includes(value.toLowerCase())
                 })
             })
        }
@@ -46,10 +49,23 @@ export class Database {
     }
 
     update(table, id, data) {
-        return true
+        const rowIndex =  this.#database[table].findIndex(row => row.id === id)
+       
+        if (rowIndex > -1) {
+            this.#database[table][rowIndex] = { id, ...data }
+            this.#persist()
+        }
     }
 
     delete(table, id) {
+        return true
+    }
+
+    originalData(table, id) {
+       return this.#database[table].find(row => row.id === id)
+    }
+
+    completeTask() {
         return true
     }
 } 
