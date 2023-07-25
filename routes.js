@@ -82,5 +82,59 @@ export const routes = [
 
             return res.writeHead(204).end()
         }
-    }
+    },
+    {
+        method: 'DELETE',
+        path: buildRoutePath('/tasks/:id'),
+        handler: (req, res) => {
+            const { id } = req.params
+
+            const originalData = database.originalData('tasks', id)
+            console.log(originalData)
+            if (!originalData) {
+                return res.writeHead(404).end()
+            }
+
+            database.delete('tasks', id)
+
+            return res.writeHead(204).end()
+        }
+    },
+    {
+        method: 'PATCH',
+        path: buildRoutePath('/tasks/:id/complete'),
+        handler: (req, res) => {
+            const { id } =  req.params
+            let dataToUpdate = {}
+            const originalData = database.originalData('tasks', id)
+
+            if (!originalData) {
+                return res.writeHead(404).end()
+            }
+
+            if (originalData.completed_at === null) {
+                dataToUpdate = {
+                    ...dataToUpdate,
+                    completed_at: dateNow
+                }
+            } else {
+                dataToUpdate = {
+                    ...dataToUpdate,
+                    completed_at: null
+                }
+            }
+
+            dataToUpdate = {
+                ...dataToUpdate,
+                title: originalData.title,
+                description: originalData.description,
+                created_at: originalData.created_at,
+                updated_at: dateNow
+            }
+
+            database.update('tasks', id, dataToUpdate)
+
+            return res.writeHead(204).end()
+        }
+    },
 ]
