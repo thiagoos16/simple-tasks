@@ -66,7 +66,7 @@ export class Database {
         }
     }
 
-    originalData(table, id) {
+    findOne(table, id) {
        return this.#database[table].find(row => row.id === id)
     }
 

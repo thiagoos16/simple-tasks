@@ -18,6 +18,13 @@ export const routes = [
                 description: search.description ? search.description : ''
             } : null)
 
+            if (!tasks) {
+                res.writeHead(404, { 'Content-Type': 'application/json' })
+                res.end(JSON.stringify({
+                    error: 'Register not found.',
+                }));
+            }
+
             return res.end(JSON.stringify(tasks))
         }
     },
@@ -25,6 +32,10 @@ export const routes = [
         method: 'POST',
         path: buildRoutePath('/tasks'),
         handler: (req, res) => {
+            if (!req.body.title || !req.body.description) {
+                return res.writeHead(400).end()
+            }
+            
             const { title, description } = req.body
 
             const task = {
@@ -47,10 +58,13 @@ export const routes = [
         handler: (req, res) => {
             const { id } =  req.params
             let dataToUpdate = {}
-            const originalData = database.originalData('tasks', id)
+            const originalData = database.findOne('tasks', id)
 
             if (!originalData) {
-                return res.writeHead(404).end()
+                res.writeHead(404, { 'Content-Type': 'application/json' })
+                res.end(JSON.stringify({
+                    error: 'Register not found.',
+                }));
             }
 
             if (req.body.title && req.body.description) {
@@ -66,8 +80,8 @@ export const routes = [
             } else {
                 dataToUpdate = {
                     ...dataToUpdate,
-                    description: req.body.description,
-                    title: originalData.title
+                    title: originalData.title,
+                    description: req.body.description
                 }
             }
 
@@ -89,8 +103,8 @@ export const routes = [
         handler: (req, res) => {
             const { id } = req.params
 
-            const originalData = database.originalData('tasks', id)
-            console.log(originalData)
+            const originalData = database.findOne('tasks', id)
+
             if (!originalData) {
                 return res.writeHead(404).end()
             }
@@ -106,7 +120,7 @@ export const routes = [
         handler: (req, res) => {
             const { id } =  req.params
             let dataToUpdate = {}
-            const originalData = database.originalData('tasks', id)
+            const originalData = database.findOne('tasks', id)
 
             if (!originalData) {
                 return res.writeHead(404).end()
