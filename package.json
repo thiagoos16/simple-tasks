@@ -10,6 +10,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "csv": "^6.3.1",
     "moment": "^2.29.4"
   }
 }
